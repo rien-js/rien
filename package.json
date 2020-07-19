@@ -1,0 +1,23 @@
+{
+  "name": "rien",
+  "version": "0.0.1",
+  "description": "A light-weight framework",
+  "main": "compiler/index.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csc309-summer-2020/js-library-jiangc54.git"
+  },
+  "author": "Chenhao Jiang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/csc309-summer-2020/js-library-jiangc54/issues"
+  },
+  "homepage": "https://github.com/csc309-summer-2020/js-library-jiangc54#readme"
+}
