@@ -10,7 +10,7 @@
   "scripts": {
     "test": "none",
     "build": "rollup -c",
-    "example": "npm run build && node index.js > example/index.js"
+    "example": "npm run build && node index.js > example/examples.js"
   },
   "repository": {
     "type": "git",
