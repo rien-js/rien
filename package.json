@@ -1,7 +1,7 @@
 {
   "name": "rien",
   "version": "0.0.1",
-  "description": "A light-weight framework",
+  "description": "A different framework",
   "main": "compiler/index.js",
   "directories": {
     "doc": "doc",
@@ -10,7 +10,8 @@
   "scripts": {
     "test": "none",
     "build": "rollup -c",
-    "example": "npm run build && node index.js > example/examples.js"
+    "example": "npm run build && node index.js > pub/examples.js",
+    "start": "npm run example && node server.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,7 @@
   "devDependencies": {
     "rollup": "^2.23.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
