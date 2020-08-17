@@ -2,8 +2,9 @@ export default {
   input: 'src/compiler/index.js',
   output: [
     {
-      file: './index.js',
-      format: 'cjs'
+      file: './pub/rien.js',
+      format: 'iife',
+      name: 'rien'
     },
     // {
     //   file: './index.umd.js',

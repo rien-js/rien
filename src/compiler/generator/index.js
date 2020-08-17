@@ -46,7 +46,7 @@ export default function generate (parsed) {
   parsed.children.forEach(child => generateNodesAndVarNames(child));
 
   const code = `
-  function component({target, props}) {
+  function Component({target, props}) {
     // TODO: props for variables
     // TODO: functions declared
     let ${varNames.join(',')}
@@ -65,10 +65,7 @@ export default function generate (parsed) {
         // TODO
       }
     }
-  }
-  const c = component({target: document.body});
-  c.create();
-  c.mount();`
+  }`
 
   return code;
 }

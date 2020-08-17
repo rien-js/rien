@@ -1,6 +1,6 @@
 {
   "name": "rien",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A different framework",
   "main": "compiler/index.js",
   "directories": {
@@ -10,8 +10,7 @@
   "scripts": {
     "test": "none",
     "build": "rollup -c",
-    "example": "npm run build && node index.js > pub/examples.js",
-    "start": "npm run example && node server.js"
+    "start": "npm run build && node server.js"
   },
   "repository": {
     "type": "git",
