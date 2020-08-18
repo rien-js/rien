@@ -1,4 +1,6 @@
 import { whiteSpace, openingTag, closingTag, attribute } from './utils/patterns.js';
+import {ParseError} from './utils/error';
+
 const log = console.log;
 
 
@@ -68,9 +70,8 @@ export default function parse(template) {
     stack.push(tagName);
   }
 
-  const throwError = (message) => {
-    const line = lineNum(template, index);
-    throw new Error(`${message} (at line ${line})`);
+  const throwError = (message, template, index) => {
+    throw new ParseError(message, template, index);
   }
 
 
@@ -95,7 +96,7 @@ export default function parse(template) {
       } else if (template.slice(index, index + 2) === '</') {
         match = template.slice(index, wholeLength).match(closingTag);
         if (!match) {
-          throwError(`Expected > for closing tag`);
+          throwError(`Expected > for closing tag`, template, index);
         }
         index += match[0].length;
         // match[0].replace(closingTag, (tag, tagName) => (tagName));
@@ -112,7 +113,7 @@ export default function parse(template) {
       } else if (template.slice(index, index + 1) === '<') {
         match = template.slice(index, wholeLength).match(openingTag);
         if (!match) {
-          throwError(`Cannot match the opening tag`);
+          throwError(`Cannot match the opening tag`, template, index);
         }
         index += match[0].length;
         match[0].replace(openingTag, parseOpeningTag);
