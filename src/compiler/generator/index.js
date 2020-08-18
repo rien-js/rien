@@ -4,7 +4,7 @@ export default (parsed) => {
 
   // TODO script and CSS
 
-  const tops = [];
+  // const tops = [];
   const nodes = [];
   const vars = [];
   let count = 0;
@@ -21,7 +21,7 @@ export default (parsed) => {
       parentIndex: node.parent.type !== 'root' ? parentIndex : -1
     }
     nodes.push(toAdd)
-    if (toAdd.parentIndex === -1) tops.push(toAdd)
+    // if (toAdd.parentIndex === -1) tops.push(toAdd)
     node.children.forEach(child => (generateNodesAndVars(child, index)));
   }
 
@@ -50,6 +50,11 @@ export default (parsed) => {
     }
   }
 
+  const detach = (node) => {
+    if (node.parentIndex === -1)
+      return `target.removeChild(${vars[node.index]})`
+  }
+
   parsed.children.forEach(child => generateNodesAndVars(child));
 
   const code = `
@@ -69,7 +74,7 @@ export default (parsed) => {
         // TODO
       },
       detach() {
-        ${tops.map(node => `target.removeChild(${vars[node.index]})`).join('\n')}
+        ${nodes.map(node => detach(node)).join('\n')}
       }
     }
   }`

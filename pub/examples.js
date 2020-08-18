@@ -27,7 +27,7 @@ const updateContent = () =>{
     if (e.type !== 'ParseError') throw e;
     log(e.message);
   }
-  log(compiled)
+  // log(compiled)
   eval(compiled);
   c = Component({ target: resultPage });
   c.create();

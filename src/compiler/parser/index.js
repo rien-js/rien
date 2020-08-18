@@ -20,15 +20,15 @@ const generateMap = (string) => {
   return map;
 }
 
-const blockElements = generateMap("address, article, aside, blockquote, \
-  canvas, dd, div, dl, dt, fieldset, figcaption, figure, footer, form, \
-  h1, h2, h3, h4, h5, h6, header, hr, li, main, nav, noscript, ol, p, \
-  pre, section, table, tfoot, ul, video");
+// const blockElements = generateMap("address, article, aside, blockquote, \
+//   canvas, dd, div, dl, dt, fieldset, figcaption, figure, footer, form, \
+//   h1, h2, h3, h4, h5, h6, header, hr, li, main, nav, noscript, ol, p, \
+//   pre, section, table, tfoot, ul, video");
 
-const inlineElements = generateMap("a, abbr, acronym, b, bdo, big, br, \
-  button, cite, code, dfn, em, i, img, input, kbd, label, map, object, \
-  output, q, samp, script, select, small, span, strong, sub, sup, textarea, \
-  time, tt, var>");
+// const inlineElements = generateMap("a, abbr, acronym, b, bdo, big, br, \
+//   button, cite, code, dfn, em, i, img, input, kbd, label, map, object, \
+//   output, q, samp, script, select, small, span, strong, sub, sup, textarea, \
+//   time, tt, var>");
 
 export default function parse(template) {
   let index = 0;
@@ -37,12 +37,13 @@ export default function parse(template) {
   const wholeLength = template.length;
 
   // Is parent necessary?
-  const createNewElement = (type, attrs, parent, name) => {
+  const createNewElement = (type, attrs, parent, name, listener) => {
     return {
       type,
       name,
       attrs,
       parent,
+      listener,
       children: []
     };
   }
@@ -58,16 +59,19 @@ export default function parse(template) {
     // TODO handle tags like <li>
     // handle tags self closed
     const attrs = [];
+    const listener = [];
     if (attributes) {
       log(attributes)
       let match;
       while (match = attribute.exec(attributes)) {
-        log(match[1])
-        log(match[2])
+        if (match[1].startsWith('on')){
+          // event listener
+          listener.push({key: match[1], value: match[2]})
+        }
         attrs.push({key: match[1], value: match[2]})
       }
     }
-    const newElement = createNewElement('element', attrs, curNode, tagName);
+    const newElement = createNewElement('element', attrs, curNode, tagName, listener);
     curNode.children.push(newElement);
     curNode = newElement;
     stack.push(tagName);
@@ -105,8 +109,8 @@ export default function parse(template) {
         }
         index += match[0].length;
         if (match[1] !== stack[stack.length - 1]) {
-          log(`match[0]=${match[0]}`)
-          log(`stack[stack.length - 1]=${stack[stack.length - 1]}`)
+          // log(`match[0]=${match[0]}`)
+          // log(`stack[stack.length - 1]=${stack[stack.length - 1]}`)
           throwError(`Expected </${stack[stack.length - 1]}> but got ${match[0]}`, template, index);
         }
         stack.pop();
@@ -136,6 +140,9 @@ export default function parse(template) {
       }
     }
     parseWhiteSpace();
+  }
+  if (stack.length !== 0){
+    throwError(`Expected </${stack[stack.length - 1]}>`, template, index);
   }
 
   return root;

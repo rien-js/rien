@@ -4,7 +4,7 @@ export function ParseError ( message, template, index ) {
   const line = lines.length
   let column = index;
   for (let i = 1; i < line ; i++){
-    log(column)
+    // log(column)
     column -= lines[i - 1].length
   }
 
