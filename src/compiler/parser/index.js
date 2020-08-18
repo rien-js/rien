@@ -59,9 +59,12 @@ export default function parse(template) {
     // handle tags self closed
     const attrs = [];
     if (attributes) {
-      let lexicalMatch;
-      while (lexicalMatch = attributes.exec(attribute)) {
-        attrs[lexicalMatch[1]] = lexicalMatch[2];
+      log(attributes)
+      let match;
+      while (match = attribute.exec(attributes)) {
+        log(match[1])
+        log(match[2])
+        attrs.push({key: match[1], value: match[2]})
       }
     }
     const newElement = createNewElement('element', attrs, curNode, tagName);
@@ -84,41 +87,45 @@ export default function parse(template) {
     if (true) {
       // if (!stack[stack.length - 1]) {
 
-      // Comment
+      
       if (template.slice(index, index + 4) === '<!--') {
+        // Comment
         index = template.indexOf('-->', index);
         if (index != -1) {
           // TODO handle comment later
           index += 3;
         }
 
-        // Closing tag
+       
       } else if (template.slice(index, index + 2) === '</') {
+        // Closing tag
         match = template.slice(index, wholeLength).match(closingTag);
         if (!match) {
-          throwError(`Expected > for closing tag`, template, index);
+          throwError(`Expected '>' for closing tag`, template, index);
         }
         index += match[0].length;
-        // match[0].replace(closingTag, (tag, tagName) => (tagName));
         if (match[1] !== stack[stack.length - 1]) {
-          // log(`match[0]=${match[0]}`)
-          // log(`stack[stack.length - 1]=${stack[stack.length - 1]}`)
-          // throwError(`Expected ${stack[stack.length - 1]} but got ${match[0]}`);
+          log(`match[0]=${match[0]}`)
+          log(`stack[stack.length - 1]=${stack[stack.length - 1]}`)
+          throwError(`Expected </${stack[stack.length - 1]}> but got ${match[0]}`, template, index);
         }
         stack.pop();
         curNode = curNode.parent;
 
+        
+      } else if (template.slice(index, index + 1) === '<') {
         // Opening tag
         // TODO: handle script and styles specially
-      } else if (template.slice(index, index + 1) === '<') {
         match = template.slice(index, wholeLength).match(openingTag);
         if (!match) {
           throwError(`Cannot match the opening tag`, template, index);
         }
         index += match[0].length;
         match[0].replace(openingTag, parseOpeningTag);
-        // text
+        
+        
       } else {
+        // text
         const endLocation = template.indexOf('<', index);
         const text = endLocation < 0
           ? template.slice(index, wholeLength)

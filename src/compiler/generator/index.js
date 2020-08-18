@@ -1,10 +1,10 @@
 
 
-export default function generate (parsed) {
+export default (parsed) => {
 
   // TODO script and CSS
 
-  const roots = [];
+  const tops = [];
   const nodes = [];
   const vars = [];
   let count = 0;
@@ -21,23 +21,27 @@ export default function generate (parsed) {
       parentIndex: node.parent.type !== 'root' ? parentIndex : -1
     }
     nodes.push(toAdd)
-    if (toAdd.parentIndex == -1) roots.push(toAdd)
+    if (toAdd.parentIndex === -1) tops.push(toAdd)
     node.children.forEach(child => (generateNodesAndVars(child, index)));
   }
 
-  const createNodeString = (node) =>{
+  const createNode = (node) =>{
     if (node.type == 'root') return ``
     const varName = vars[node.index]
     switch (node.type) {
       case 'element':
-        return `${varName} = document.createElement("${node.name}")`
+        let result = [`${varName} = document.createElement("${node.name}")`]
+        if (node.attrs && node.attrs.length !== 0) {
+          node.attrs.forEach(entry => result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`))
+        }
+        return result.join('\n')
       case 'text':
         // replace change line chararter
         return `${varName} = document.createTextNode("${node.name.replace(/\n/g, '\\n')}")`
     }
   }
 
-  const mountNodeString = (node) => {
+  const mountNode = (node) => {
     // -1 represents root
     if (node.parentIndex !== -1){
       return `${vars[node.parentIndex]}.appendChild(${vars[node.index]})`
@@ -55,20 +59,22 @@ export default function generate (parsed) {
     let ${vars.join(',')}
     return {
       create() {
-        ${nodes.map(node => createNodeString(node)).join('\n')}
+        ${nodes.map(node => createNode(node)).join('\n')}
        // TODO attributes and eventsListeners 
       },
       mount() {
-        ${nodes.map(node => mountNodeString(node)).join('\n')}
+        ${nodes.map(node => mountNode(node)).join('\n')}
       },
       update(changes) {
         // TODO
       },
       detach() {
-        ${roots.map(node => `target.removeChild(${vars[node.index]})`).join('\n')}
+        ${tops.map(node => `target.removeChild(${vars[node.index]})`).join('\n')}
       }
     }
   }`
 
   return code;
 }
+
+
