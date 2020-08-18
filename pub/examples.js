@@ -1,3 +1,11 @@
+
+const log = console.log
+
+
+const resultBlock = document.getElementById("result-block")
+const resultPage = document.createElement('div')
+resultBlock.appendChild(resultPage)
+
 // codemirror editor
 const myTextArea = document.getElementById('editor-text')
 const editor = CodeMirror.fromTextArea(myTextArea, {
@@ -7,31 +15,36 @@ const editor = CodeMirror.fromTextArea(myTextArea, {
   theme: 'material',
   lineWrapping: true
 });
-  editor.on('change', () => {
-  console.log(editor.getValue());
-});
-  
 
-const codeNode = document.getElementById("editor-text")
-const code = codeNode.textContent
-
-
-const resultBlock = document.getElementById("result-block")
-const resultPage = document.createElement('div')
-// resultPage.innerHTML = code
-// resultBlock.appendChild(resultPage)
-
-// document.body.appendChild(resultBlock)
-
-
-const compiled = rien(code)
+let code = editor.getValue();
+console.log(code)
+let compiled = rien(code)
+log(compiled)
 eval(compiled);
-
-const c = Component({target: resultPage});
+let c = Component({ target: resultPage });
 c.create();
 c.mount();
 
-resultBlock.appendChild(resultPage)
+
+editor.on('change', () => {
+  c.detach();
+  delete(c);
+  code = editor.getValue()
+  compiled = rien(code)
+  log(compiled)
+  eval(compiled);
+  c = Component({ target: resultPage });
+  c.create();
+  c.mount();
+});
+
+
+// const codeNode = document.getElementById("editor-text")
+// const code = codeNode.textContent
+
+
+
+
 
 
 // function component({target, props}) {

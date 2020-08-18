@@ -4,27 +4,30 @@ export default function generate (parsed) {
 
   // TODO script and CSS
 
+  const roots = [];
   const nodes = [];
-  const varNames = [];
+  const vars = [];
   let count = 0;
 
-  const generateNodesAndVarNames = (node, parentIndex) => {
+  const generateNodesAndVars = (node, parentIndex) => {
     const varName = node.type[0] + count;
     const index = count++;
-    varNames.push(varName);
-    nodes.push({
+    vars.push(varName);
+    const toAdd = {
       type: node.type,
       name: node.name,
       index,
       attrs: node.attrs,
       parentIndex: node.parent.type !== 'root' ? parentIndex : -1
-    })
-    node.children.forEach(child => (generateNodesAndVarNames(child, index)));
+    }
+    nodes.push(toAdd)
+    if (toAdd.parentIndex == -1) roots.push(toAdd)
+    node.children.forEach(child => (generateNodesAndVars(child, index)));
   }
 
   const createNodeString = (node) =>{
     if (node.type == 'root') return ``
-    const varName = varNames[node.index]
+    const varName = vars[node.index]
     switch (node.type) {
       case 'element':
         return `${varName} = document.createElement("${node.name}")`
@@ -37,19 +40,19 @@ export default function generate (parsed) {
   const mountNodeString = (node) => {
     // -1 represents root
     if (node.parentIndex !== -1){
-      return `${varNames[node.parentIndex]}.appendChild(${varNames[node.index]})`
+      return `${vars[node.parentIndex]}.appendChild(${vars[node.index]})`
     } else {
-      return `target.append(${varNames[node.index]})`
+      return `target.append(${vars[node.index]})`
     }
   }
 
-  parsed.children.forEach(child => generateNodesAndVarNames(child));
+  parsed.children.forEach(child => generateNodesAndVars(child));
 
   const code = `
   function Component({target, props}) {
     // TODO: props for variables
     // TODO: functions declared
-    let ${varNames.join(',')}
+    let ${vars.join(',')}
     return {
       create() {
         ${nodes.map(node => createNodeString(node)).join('\n')}
@@ -62,7 +65,7 @@ export default function generate (parsed) {
         // TODO
       },
       detach() {
-        // TODO
+        ${roots.map(node => `target.removeChild(${vars[node.index]})`).join('\n')}
       }
     }
   }`
