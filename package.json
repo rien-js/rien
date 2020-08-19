@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/csc309-summer-2020/js-library-jiangc54#readme",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "acorn": "^8.0.1",
     "rollup": "^2.23.0"
   },
   "dependencies": {

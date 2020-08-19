@@ -1,5 +1,6 @@
-import { whiteSpace, openingTag, closingTag, attribute } from './utils/patterns.js';
-import {ParseError} from './utils/error';
+import { parse } from 'acorn';
+import { whiteSpace, openingTag, closingTag, attribute, scriptEnd } from './utils/patterns.js';
+import { ParseError } from './utils/error';
 
 const log = console.log;
 
@@ -30,11 +31,12 @@ const generateMap = (string) => {
 //   output, q, samp, script, select, small, span, strong, sub, sup, textarea, \
 //   time, tt, var>");
 
-export default function parse(template) {
-  let index = 0;
-  let stack = [];
-  let match;
-  const wholeLength = template.length;
+export default (template) => {
+  let index = 0
+  let stack = []
+  let match
+  const wholeLength = template.length
+  let parsedJs
 
   // Is parent necessary?
   const createNewElement = (type, attrs, parent, name, listener) => {
@@ -64,11 +66,12 @@ export default function parse(template) {
       log(attributes)
       let match;
       while (match = attribute.exec(attributes)) {
-        if (match[1].startsWith('on')){
+        if (match[1].startsWith('on')) {
           // event listener
-          listener.push({key: match[1], value: match[2]})
+          listener.push({ key: match[1].slice(2).toLowerCase(), value: match[2] })
+        } else {
+          attrs.push({ key: match[1], value: match[2] })
         }
-        attrs.push({key: match[1], value: match[2]})
       }
     }
     const newElement = createNewElement('element', attrs, curNode, tagName, listener);
@@ -91,7 +94,7 @@ export default function parse(template) {
     if (true) {
       // if (!stack[stack.length - 1]) {
 
-      
+
       if (template.slice(index, index + 4) === '<!--') {
         // Comment
         index = template.indexOf('-->', index);
@@ -100,7 +103,7 @@ export default function parse(template) {
           index += 3;
         }
 
-       
+
       } else if (template.slice(index, index + 2) === '</') {
         // Closing tag
         match = template.slice(index, wholeLength).match(closingTag);
@@ -113,10 +116,10 @@ export default function parse(template) {
           // log(`stack[stack.length - 1]=${stack[stack.length - 1]}`)
           throwError(`Expected </${stack[stack.length - 1]}> but got ${match[0]}`, template, index);
         }
-        stack.pop();
-        curNode = curNode.parent;
+        if (match[1] !== "script")
+          curNode = curNode.parent;
+        stack.pop()
 
-        
       } else if (template.slice(index, index + 1) === '<') {
         // Opening tag
         // TODO: handle script and styles specially
@@ -125,14 +128,37 @@ export default function parse(template) {
           throwError(`Cannot match the opening tag`, template, index);
         }
         index += match[0].length;
-        match[0].replace(openingTag, parseOpeningTag);
-        
-        
+        if (match[1] === "script") {
+          // parse script here
+          if (parsedJs) throwError(`A component could only have one script element`, template, index) 
+          stack.push("script");
+          const endIndex = template.slice(index).search(scriptEnd)
+          if (endIndex) {
+            const endLocation = endIndex + index
+            const scriptContent = template.slice(index, endLocation)
+            // if (scriptContent) {
+              log(`scriptContent=${scriptContent}`)
+              parsedJs = parse(scriptContent, { ecmaVersion: 2017 })
+            // }   
+            index = endLocation
+          }
+        } else {
+          match[0].replace(openingTag, parseOpeningTag);
+        }
+
+      } else if (template.slice(index, index + 1) === '{') {
+        // curly braces
+        // TODO
+
       } else {
         // text
-        const endLocation = template.indexOf('<', index);
+        const nextArrow = template.indexOf('<', index)
+        const nextCurly = template.indexOf('{', index)
+        const endLocation = nextArrow === -1
+          ? nextCurly
+          : (nextArrow > nextCurly && nextCurly !== -1) ? nextCurly : nextArrow
         const text = endLocation < 0
-          ? template.slice(index, wholeLength)
+          ? template.slice(index)
           : template.slice(index, endLocation);
         index += text.length;
         const textElement = createNewElement('text', null, curNode, text);
@@ -141,7 +167,7 @@ export default function parse(template) {
     }
     parseWhiteSpace();
   }
-  if (stack.length !== 0){
+  if (stack.length !== 0) {
     throwError(`Expected </${stack[stack.length - 1]}>`, template, index);
   }
 

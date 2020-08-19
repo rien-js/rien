@@ -31,9 +31,14 @@ export default (parsed) => {
     switch (node.type) {
       case 'element':
         let result = [`${varName} = document.createElement("${node.name}")`]
+        // add attrs if there is any
         if (node.attrs && node.attrs.length !== 0) {
           node.attrs.forEach(entry => result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`))
         }
+        if (node.listeners && node.listeners.length !== 0) {
+          node.listeners.forEach(entry => result.push(`${varName}.addEventListener("${entry.key}", ${entry.value})`))
+        }
+        
         return result.join('\n')
       case 'text':
         // replace change line chararter
@@ -65,7 +70,7 @@ export default (parsed) => {
     return {
       create() {
         ${nodes.map(node => createNode(node)).join('\n')}
-       // TODO attributes and eventsListeners 
+       // TODO eventsListeners 
       },
       mount() {
         ${nodes.map(node => mountNode(node)).join('\n')}
