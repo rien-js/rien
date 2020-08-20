@@ -1,4 +1,5 @@
-
+import handleScript from './utils/handleScript'
+import { scriptEnd } from '../parser/utils/patterns';
 
 export default (parsed) => {
 
@@ -43,6 +44,8 @@ export default (parsed) => {
       case 'text':
         // replace change line chararter
         return `${varName} = document.createTextNode("${node.name.replace(/\n/g, '\\n')}")`
+      case 'curly':
+        return `${varName} = document.createTextNode(${node.name})`
     }
   }
 
@@ -60,12 +63,17 @@ export default (parsed) => {
       return `target.removeChild(${vars[node.index]})`
   }
 
-  parsed.children.forEach(child => generateNodesAndVars(child));
+  parsed.root.children.forEach(child => generateNodesAndVars(child));
+  // const {props, statements} = handleScript(parsed.parsedScript)
 
   const code = `
+
   function Component({target, props}) {
     // TODO: props for variables
     // TODO: functions declared
+    
+    ${parsed.script}
+
     let ${vars.join(',')}
     return {
       create() {

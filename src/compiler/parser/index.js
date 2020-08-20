@@ -12,14 +12,14 @@ const log = console.log;
 
 // not support for attributes yet
 
-const generateMap = (string) => {
-  const map = {};
-  const items = string.split(',');
-  items.forEach((item) => {
-    map[item.trim()] = true;
-  })
-  return map;
-}
+// const generateMap = (string) => {
+//   const map = {};
+//   const items = string.split(',');
+//   items.forEach((item) => {
+//     map[item.trim()] = true;
+//   })
+//   return map;
+// }
 
 // const blockElements = generateMap("address, article, aside, blockquote, \
 //   canvas, dd, div, dl, dt, fieldset, figcaption, figure, footer, form, \
@@ -36,7 +36,8 @@ export default (template) => {
   let stack = []
   let match
   const wholeLength = template.length
-  let parsedJs
+  let parsedScript
+  let script
 
   // Is parent necessary?
   const createNewElement = (type, attrs, parent, name, listener) => {
@@ -130,15 +131,17 @@ export default (template) => {
         index += match[0].length;
         if (match[1] === "script") {
           // parse script here
-          if (parsedJs) throwError(`A component could only have one script element`, template, index) 
+          if (parsedScript) throwError(`A component could only have one script element`, template, index) 
           stack.push("script");
           const endIndex = template.slice(index).search(scriptEnd)
           if (endIndex) {
             const endLocation = endIndex + index
             const scriptContent = template.slice(index, endLocation)
             // if (scriptContent) {
-              log(`scriptContent=${scriptContent}`)
-              parsedJs = parse(scriptContent, { ecmaVersion: 2017 })
+              script = scriptContent
+              log(`script=${scriptContent}`)
+              parsedScript = parse(scriptContent, { ecmaVersion: 2017 })
+              log(parsedScript)
             // }   
             index = endLocation
           }
@@ -148,8 +151,15 @@ export default (template) => {
 
       } else if (template.slice(index, index + 1) === '{') {
         // curly braces
-        // TODO
-
+        index++
+        const curlyEnd = template.indexOf('}', index)
+        if (curlyEnd === -1) throwError(`Expected close of {}`, template, index)
+        const curlyContent = template.slice(index, curlyEnd).trim()
+        index = curlyEnd + 1
+        if (curlyContent !== ''){
+          const curlyElement = createNewElement('curly', null, curNode, curlyContent.trim())
+          curNode.children.push(curlyElement)
+        } 
       } else {
         // text
         const nextArrow = template.indexOf('<', index)
@@ -171,6 +181,6 @@ export default (template) => {
     throwError(`Expected </${stack[stack.length - 1]}>`, template, index);
   }
 
-  return root;
+  return {root, script, parsedScript};
 };
 
