@@ -24,7 +24,8 @@ const updateContent = () =>{
   try {
     compiled = rien(code)
   } catch (e) {
-    if (e.type !== 'ParseError') throw e;
+    // if (e.type === 'SyntaxError') log(e);
+    // else if (e.type !== 'ParseError') throw e;
     log(e.message);
   }
   // log(compiled)

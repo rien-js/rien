@@ -19,11 +19,19 @@
   <div id="input-editor">
 
     <textarea id="editor-text">
+<script>
+  let name = 'world'
+  let test1 = 'nested'
+  let purple = "color: #8A2BE2"
+</script> 
 <div>
-  <h1>Hello World !</h1>
-  <div>test for nested</div>
+  <h1 style={purple}>Hello {name} !</h1>
+  <div>
+    <span>test for {test1}</span>
+  </div>
 </div>
-    </textarea>
+                
+          </textarea>
 
   </div>
 

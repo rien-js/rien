@@ -39,7 +39,6 @@ export default (parsed) => {
         if (node.listeners && node.listeners.length !== 0) {
           node.listeners.forEach(entry => result.push(`${varName}.addEventListener("${entry.key}", ${entry.value})`))
         }
-        
         return result.join('\n')
       case 'text':
         // replace change line chararter

@@ -67,11 +67,12 @@ export default (template) => {
       log(attributes)
       let match;
       while (match = attribute.exec(attributes)) {
-        if (match[1].startsWith('on')) {
+        if (match[1].startsWith('r-on')) {
           // event listener
           listener.push({ key: match[1].slice(2).toLowerCase(), value: match[2] })
         } else {
-          attrs.push({ key: match[1], value: match[2] })
+          if (match[3]) attrs.push({ key: match[1], value: match[2] })
+          else attrs.push({ key: match[1], value: match[6] })
         }
       }
     }
@@ -123,7 +124,7 @@ export default (template) => {
 
       } else if (template.slice(index, index + 1) === '<') {
         // Opening tag
-        // TODO: handle script and styles specially
+        // TODO: handle styles specially
         match = template.slice(index, wholeLength).match(openingTag);
         if (!match) {
           throwError(`Cannot match the opening tag`, template, index);
@@ -157,7 +158,7 @@ export default (template) => {
         const curlyContent = template.slice(index, curlyEnd).trim()
         index = curlyEnd + 1
         if (curlyContent !== ''){
-          const curlyElement = createNewElement('curly', null, curNode, curlyContent.trim())
+          const curlyElement = createNewElement('curly', null, curNode, curlyContent)
           curNode.children.push(curlyElement)
         } 
       } else {
@@ -170,7 +171,8 @@ export default (template) => {
         const text = endLocation < 0
           ? template.slice(index)
           : template.slice(index, endLocation);
-        index += text.length;
+        // index += text.length;
+        index = endLocation
         const textElement = createNewElement('text', null, curNode, text);
         curNode.children.push(textElement);
       }
