@@ -59,8 +59,9 @@ export default (parsed) => {
   }
 
   const detach = (node) => {
-    if (node.parentIndex === -1)
+    if (node.parentIndex === -1){
       return `target.removeChild(${vars[node.index]})`
+    }
   }
 
   parsed.root.children.forEach(child => generateNodesAndVars(child));
@@ -91,7 +92,7 @@ export default (parsed) => {
       }
     }
   }`
-
+  log(nodes)
   return code;
 }
 

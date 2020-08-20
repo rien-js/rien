@@ -24,20 +24,26 @@ const updateContent = () =>{
   try {
     compiled = rien(code)
   } catch (e) {
-    // if (e.type !== 'ParseError') throw e;
+    if (e.type !== 'ParseError') throw e;
     log(e.message);
   }
-  log(compiled)
-  eval(compiled);
-  c = Component({ target: resultPage });
-  c.create();
-  c.mount(); 
+  // log(compiled)
+  try {
+    eval(compiled);
+    c = Component({ target: resultPage });
+    c.create();
+    c.mount(); 
+  } catch (e) {
+    log(`Error: ${e.message}`);
+  }
 }
 
 updateContent();
 
 editor.on('change', () => {
-  c.detach();
+  try {
+    c.detach();
+  } catch (e) {}
   updateContent();
 });
 
