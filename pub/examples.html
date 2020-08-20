@@ -16,7 +16,8 @@
 </head>
 
 <body>
-  <div id="input-editor">
+
+  <!-- <div id="input-editor">
 
     <textarea id="editor-text">
 <script>
@@ -33,7 +34,35 @@
                 
           </textarea>
 
+  </div> -->
+
+
+
+
+
+
+  <div id="input-editor">
+
+    <textarea id="editor-text">
+<script>
+  let name = 'world'
+  let test1 = 'nested'
+  let purple = "color: #8A2BE2"
+  function handleClick() {
+    alert(`Hello ${name}!`);
+  }
+</script> 
+<div>
+  <button r-onClick={handleClick}>Hello {name}</button>
+  <h1 style={purple}>Hello {name} !</h1>
+  <div>
+    <span>test for {test1}</span>
   </div>
+</div>
+          </textarea>
+
+  </div>
+
 
   
 

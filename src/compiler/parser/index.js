@@ -40,13 +40,13 @@ export default (template) => {
   let script
 
   // Is parent necessary?
-  const createNewElement = (type, attrs, parent, name, listener) => {
+  const createNewElement = (type, attrs, parent, name, listeners) => {
     return {
       type,
       name,
       attrs,
       parent,
-      listener,
+      listeners,
       children: []
     };
   }
@@ -62,21 +62,26 @@ export default (template) => {
     // TODO handle tags like <li>
     // handle tags self closed
     const attrs = [];
-    const listener = [];
+    const listeners = [];
     if (attributes) {
+      log("attrs")
       log(attributes)
       let match;
       while (match = attribute.exec(attributes)) {
+        log(match)
         if (match[1].startsWith('r-on')) {
+          if (match[2]!==''){
           // event listener
-          listener.push({ key: match[1].slice(2).toLowerCase(), value: match[2] })
+            log("success")
+            listeners.push({ key: match[1].slice(4).toLowerCase(), value: match[6] })
+          }
         } else {
           if (match[3]) attrs.push({ key: match[1], value: match[2] })
-          else attrs.push({ key: match[1], value: match[6] })
+          else if (match[5]) attrs.push({ key: match[1], value: match[6] })
         }
       }
     }
-    const newElement = createNewElement('element', attrs, curNode, tagName, listener);
+    const newElement = createNewElement('element', attrs, curNode, tagName, listeners);
     curNode.children.push(newElement);
     curNode = newElement;
     stack.push(tagName);

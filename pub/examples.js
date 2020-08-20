@@ -24,18 +24,19 @@ const updateContent = () =>{
   try {
     compiled = rien(code)
   } catch (e) {
-    // if (e.type === 'SyntaxError') log(e);
-    // else if (e.type !== 'ParseError') throw e;
-    log(e.message);
+    if (e.type === 'SyntaxError') log(e);
+    else if (e.type !== 'ParseError') throw e;
+    // log(e.message);
   }
-  // log(compiled)
+  log(compiled)
   try {
     eval(compiled);
     c = Component({ target: resultPage });
     c.create();
     c.mount(); 
   } catch (e) {
-    log(`Error: ${e.message}`);
+    log(e)
+    // log(`Error: ${e.message}`);
   }
 }
 

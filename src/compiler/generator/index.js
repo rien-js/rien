@@ -19,6 +19,7 @@ export default (parsed) => {
       name: node.name,
       index,
       attrs: node.attrs,
+      listeners: node. listeners,
       parentIndex: node.parent.type !== 'root' ? parentIndex : -1
     }
     nodes.push(toAdd)
@@ -36,6 +37,8 @@ export default (parsed) => {
         if (node.attrs && node.attrs.length !== 0) {
           node.attrs.forEach(entry => result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`))
         }
+        log("listeners:")
+        log(node.listeners)
         if (node.listeners && node.listeners.length !== 0) {
           node.listeners.forEach(entry => result.push(`${varName}.addEventListener("${entry.key}", ${entry.value})`))
         }
@@ -70,7 +73,6 @@ export default (parsed) => {
 
   function Component({target, props}) {
     // TODO: props for variables
-    // TODO: functions declared
     
     ${parsed.script}
 
@@ -78,7 +80,6 @@ export default (parsed) => {
     return {
       create() {
         ${nodes.map(node => createNode(node)).join('\n')}
-       // TODO eventsListeners 
       },
       mount() {
         ${nodes.map(node => mountNode(node)).join('\n')}
