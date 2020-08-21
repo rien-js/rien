@@ -39,7 +39,8 @@ export default (parsed) => {
           node.attrs.forEach(entry => result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`))
         }
         if (node.listeners && node.listeners.length !== 0) {
-          node.listeners.forEach(entry => result.push(`${varName}.addEventListener("${entry.key}", ${entry.value})`))
+          node.listeners.forEach(entry => {
+            if (entry.value) result.push(`${varName}.addEventListener("${entry.key}", ${entry.value})`)})
         }
         return result.join('\n')
       case 'text':

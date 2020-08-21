@@ -10,7 +10,7 @@ resultBlock.appendChild(resultPage)
 const myTextArea = document.getElementById('editor-text')
 const editor = CodeMirror.fromTextArea(myTextArea, {
   lineNumbers: true,
-  mode: 'htmlmixed',
+  mode: 'jsx',
   htmlMode: true,
   theme: 'material',
   lineWrapping: true

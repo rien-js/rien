@@ -43,15 +43,30 @@ export default (template) => {
       while (match = attribute.exec(attributes)) {
         log(match)
         if (match[1].startsWith('r-on')) {
-          if (match[2]!==''){
+          // if (match[6]!==''){
           // event listener
-            listeners.push({ key: match[1].slice(4).toLowerCase(), value: match[6] })
+          listeners.push({ key: match[1].slice(4).toLowerCase(), value: match[6] })
 
             // const expression = parseExpressionAt(match[6])
             // if ( expression.type !== 'CallExpression' ) {
             //   throwError( `Expected call expression`, template, index );
             // }
             // listeners.push({ key: match[1].slice(4).toLowerCase(), value: expression })
+          // }
+        } else if (match[1] === 'r-bind'){
+          // data binding
+          if (!match[6]) continue
+          switch (tagName){
+            case 'textarea':
+              attrs.push({key: "value", value: match[6]})
+              listeners.push({key: "input", value: `(e)=>{${match[6]} = e.target.value}`})
+            case 'select':
+              attrs.push({key: "value", value: match[6]})
+              listeners.push({key: "change", value: `(e)=>{${match[6]} = e.target.value}`})
+            case 'input':
+              // TODO: handle different kinds of input, for now just handle text.
+              attrs.push({key: "value", value: match[6]})
+              listeners.push({key: "input", value: `(e)=>{${match[6]} = e.target.value}`})
           }
         } else {
           if (match[3]) attrs.push({ key: match[1], value: match[2] })

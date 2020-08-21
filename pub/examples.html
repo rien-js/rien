@@ -62,7 +62,7 @@
 
 
 
-  <div id="input-editor">
+  <!-- <div id="input-editor">
 
     <textarea id="editor-text">
 <script>
@@ -83,7 +83,28 @@
                 
           </textarea>
 
+  </div> -->
+
+
+  <div id="input-editor">
+
+    <textarea id="editor-text">
+<script>
+  const data = {
+    name: 'Hello World'
+  }
+  
+</script> 
+<div>
+  <input r-bind={data.name}/>
+  <h1>{data.name}</h1>
+</div>
+                      
+                
+          </textarea>
+
   </div>
+
 
 
 
@@ -104,6 +125,7 @@
   <script src="https://unpkg.com/codemirror@5.40.0/mode/css/css.js"></script>
   <script src="https://unpkg.com/codemirror@5.40.0/mode/xml/xml.js"></script>
   <script src="https://unpkg.com/codemirror@5.40.0/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="https://unpkg.com/codemirror@5.40.0/mode/jsx/jsx.js"></script>
   <script src="./rien.js"></script>
   <script src="./examples.js"></script>
 </body>
