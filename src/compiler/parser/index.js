@@ -1,5 +1,5 @@
 import { parse, parseExpressionAt } from 'acorn';
-import {selfClosingElements} from './utils/elements';
+import { selfClosingElements } from './utils/elements';
 import { whiteSpace, openingTag, closingTag, attribute, scriptEnd } from './utils/patterns.js';
 import { ParseError } from './utils/error';
 
@@ -47,26 +47,26 @@ export default (template) => {
           // event listener
           listeners.push({ key: match[1].slice(4).toLowerCase(), value: match[6] })
 
-            // const expression = parseExpressionAt(match[6])
-            // if ( expression.type !== 'CallExpression' ) {
-            //   throwError( `Expected call expression`, template, index );
-            // }
-            // listeners.push({ key: match[1].slice(4).toLowerCase(), value: expression })
+          // const expression = parseExpressionAt(match[6])
+          // if ( expression.type !== 'CallExpression' ) {
+          //   throwError( `Expected call expression`, template, index );
           // }
-        } else if (match[1] === 'r-bind'){
+          // listeners.push({ key: match[1].slice(4).toLowerCase(), value: expression })
+          // }
+        } else if (match[1] === 'r-bind') {
           // data binding
           if (!match[6]) continue
-          switch (tagName){
+          switch (tagName) {
             case 'textarea':
-              attrs.push({key: "value", value: match[6]})
-              listeners.push({key: "input", value: `(e)=>{${match[6]} = e.target.value}`})
+              attrs.push({ key: "value", value: match[6] })
+              listeners.push({ key: "input", value: `(e)=>{${match[6]} = e.target.value}` })
             case 'select':
-              attrs.push({key: "value", value: match[6]})
-              listeners.push({key: "change", value: `(e)=>{${match[6]} = e.target.value}`})
+              attrs.push({ key: "value", value: match[6] })
+              listeners.push({ key: "change", value: `(e)=>{${match[6]} = e.target.value}` })
             case 'input':
               // TODO: handle different kinds of input, for now just handle text.
-              attrs.push({key: "value", value: match[6]})
-              listeners.push({key: "input", value: `(e)=>{${match[6]} = e.target.value}`})
+              attrs.push({ key: "value", value: match[6] })
+              listeners.push({ key: "input", value: `(e)=>{${match[6]} = e.target.value}` })
           }
         } else {
           if (match[3]) attrs.push({ key: match[1], value: match[2] })
@@ -83,7 +83,7 @@ export default (template) => {
     }
     log('stack:')
     log(stack)
-    
+
   }
 
   const throwError = (message, template, index) => {
@@ -135,17 +135,17 @@ export default (template) => {
         index += match[0].length;
         if (match[1] === "script") {
           // parse script here
-          if (parsedScript) throwError(`A component could only have one script element`, template, index) 
+          if (parsedScript) throwError(`A component could only have one script element`, template, index)
           stack.push("script");
           const endIndex = template.slice(index).search(scriptEnd)
           if (endIndex) {
             const endLocation = endIndex + index
             const scriptContent = template.slice(index, endLocation)
             // if (scriptContent) {
-              script = scriptContent
-              log(`script=${scriptContent}`)
-              parsedScript = parse(scriptContent, { ecmaVersion: 2017 })
-              log(parsedScript)
+            script = scriptContent
+            log(`script=${scriptContent}`)
+            parsedScript = parse(scriptContent, { ecmaVersion: 2017 })
+            log(parsedScript)
             // }   
             index = endLocation
           }
@@ -156,14 +156,31 @@ export default (template) => {
       } else if (template.slice(index, index + 1) === '{') {
         // curly braces
         index++
-        const curlyEnd = template.indexOf('}', index)
-        if (curlyEnd === -1) throwError(`Expected close of {}`, template, index)
-        const curlyContent = template.slice(index, curlyEnd).trim()
-        index = curlyEnd + 1
-        if (curlyContent !== ''){
-          const curlyElement = createNewElement('curly', null, curNode, curlyContent)
-          curNode.children.push(curlyElement)
-        } 
+
+        // simple for loop rendering
+        parseWhiteSpace()
+        if (template.slice(index, index + 5) === 'r-for') {
+          index += 5
+          log('successfully got r-for')
+          const forEnd = template.indexOf('r-end}', index)
+          if (forEnd === -1) throwError(`Expected r-end of for rendering block`, template, index)
+          const forContent = template.slice(index, forEnd).trim()
+          if (forContent !== ''){
+            const forElement = createNewElement('for', null, curNode, forContent)
+            curNode.children.push(forElement)
+          }
+          index = forEnd + 6
+        }
+        else {
+          const curlyEnd = template.indexOf('}', index)
+          if (curlyEnd === -1) throwError(`Expected close of {}`, template, index)
+          const curlyContent = template.slice(index, curlyEnd).trim()
+          if (curlyContent !== '') {
+            const curlyElement = createNewElement('curly', null, curNode, curlyContent)
+            curNode.children.push(curlyElement)
+          }
+          index = curlyEnd + 1
+        }
       } else {
         // text
         const nextArrow = template.indexOf('<', index)
@@ -186,6 +203,6 @@ export default (template) => {
     throwError(`Expected </${stack[stack.length - 1]}>`, template, index);
   }
 
-  return {root, script, parsedScript};
+  return { root, script, parsedScript };
 };
 

@@ -106,7 +106,32 @@
   </div>
 
 
+  <!-- <div id="input-editor">
 
+    <textarea id="editor-text">
+  <script>
+    const data = {
+      name: '',
+      lst: [{id: 0, name: "abc"}, {id: 1, name: "qwe"}]
+    }
+    handleClick = () =>{
+      console.log(data.lst)
+      data.lst = [...data.lst, {id: data.lst.length, name: data.name}]
+      data.name = ''
+    }
+  </script> 
+  <div>
+    <input r-bind={data.name}/>
+    <button style="width:100px; height:30px" r-onClick={handleClick}>add</button>
+    {r-for
+      data.lst.map(item => `<li>${item.name}</li>`)
+    r-end}
+  </div>
+
+
+</textarea>
+
+</div> -->
 
 
 

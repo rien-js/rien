@@ -3,13 +3,15 @@ import { scriptEnd } from '../parser/utils/patterns';
 
 export default (parsed) => {
 
-  // TODO script and CSS
+  // TODO CSS
 
   // const tops = [];
   const nodes = [];
   const vars = [];
   const curlyMapping = {};
+  const forVars = [];
   let count = 0;
+  let forStatement
 
   const generateNodesAndVars = (node, parentIndex) => {
     const varName = node.type[0] + count;
@@ -36,7 +38,14 @@ export default (parsed) => {
         let result = [`${varName} = document.createElement("${node.name}")`]
         // add attrs if there is any
         if (node.attrs && node.attrs.length !== 0) {
-          node.attrs.forEach(entry => result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`))
+          node.attrs.forEach(entry => {
+            if (entry.value.startsWith('data.')){
+              const name = entry.value.slice(5)
+              if (curlyMapping[name]) curlyMapping[name].push(varName)
+              else curlyMapping[name] = [varName]
+            }
+            result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`)
+          })
         }
         if (node.listeners && node.listeners.length !== 0) {
           node.listeners.forEach(entry => {
@@ -53,6 +62,12 @@ export default (parsed) => {
           else curlyMapping[name] = [varName]
         }
         return `${varName} = document.createTextNode(${node.name})`
+      case 'for':
+        forStatement = node.name
+        const mapIndex = node.name.indexOf('.map')
+        return `${varName} = document.createElement("div")\n \
+        ${varName}.innerHTML = ${node.name}.join('')\n \
+        ${node.name.startsWith('data.') && `mapList('${node.name.slice(5, mapIndex)}', ${varName})`}`
     }
   }
 
@@ -74,35 +89,7 @@ export default (parsed) => {
   parsed.root.children.forEach(child => generateNodesAndVars(child));
   // const {props, statements} = handleScript(parsed.parsedScript)
 
-  
-  const code = `
-
-function Component({target, props}) {
-  // TODO: props
-  let ${vars.join(',')}
-  
-  ${parsed.script}
-  
-  mapValue = (varName, nodes) => { 
-    const defaultValue = data[varName]
-    Object.defineProperty(data, varName, {
-      get: () => {
-        return this.value;
-      },
-      set: (newValue) => { 
-        nodes.forEach(node => {
-          node.nodeValue = newValue
-          console.log(node)
-        })
-        this.value = newValue;
-     },
-     configurable: true
-    })
-    data[varName] = defaultValue
-  }
-
-
-
+  const returnPartCode = `
   return {
     create() {
       ${nodes.map(node => createNode(node)).join('\n')}
@@ -121,6 +108,56 @@ function Component({target, props}) {
     }
   }
 }`
+
+
+
+  const code = `
+
+function Component({target, props}) {
+  // TODO: props
+  let ${vars.join(',')}
+  
+  ${parsed.script}
+  ${(curlyMapping && Object.entries(curlyMapping).length !== 0) &&
+  `mapValue = (stateName, nodes) => { 
+    const defaultValue = data[stateName]
+    Object.defineProperty(data, stateName, {
+      get: () => {
+        return this.value;
+      },
+      set: (newValue) => { 
+        nodes.forEach(node => {
+          if (node.nodeType === 3)  node.nodeValue = newValue
+          else {
+            node.value = newValue
+          }
+          console.log(node)
+        })
+        this.value = newValue;
+     },
+     configurable: true
+    })
+    data[stateName] = defaultValue
+  }`}
+
+  ${forStatement && `
+  // temporarily only support one for block
+  mapList = (stateName, node) => { 
+    const defaultValue = data[stateName]
+    Object.defineProperty(data, stateName, {
+      get: () => {
+        return this.value;
+      },
+      set: (newValue) => { 
+        this.value = newValue;
+        node.innerHTML = ${forStatement}.join('')
+     },
+     configurable: true
+    })
+    data[stateName] = defaultValue
+  }`}
+` + returnPartCode
+
   log(nodes)
   return code;
 }
