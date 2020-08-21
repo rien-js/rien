@@ -3,7 +3,7 @@ export default {
   input: 'src/compiler/index.js',
   output: [
     {
-      file: './pub/rien.js',
+      file: './pub/rien.umd.js',
       format: 'umd',
       name: 'rien',
     },

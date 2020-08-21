@@ -131,7 +131,6 @@ function Component({target, props}) {
           else {
             node.value = newValue
           }
-          console.log(node)
         })
         this.value = newValue;
      },
@@ -158,7 +157,6 @@ function Component({target, props}) {
   }`}
 ` + returnPartCode
 
-  log(nodes)
   return code;
 }
 

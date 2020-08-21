@@ -5,7 +5,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="preload" href="rien.js" as='script'>
   <link rel="stylesheet" href="https://unpkg.com/codemirror@5.40.0/lib/codemirror.css">
   <link rel="stylesheet" href="https://unpkg.com/codemirror@5.40.0/theme/material.css">
   <link rel="stylesheet" href="styles.css">
@@ -86,27 +85,30 @@
   </div> -->
 
 
-  <div id="input-editor">
+  <!-- <div id="input-editor">
 
     <textarea id="editor-text">
 <script>
   const data = {
     name: 'Hello World'
   }
-  
+  change = () =>{
+  	data.name = 'Bonjour le monde'
+  }
 </script> 
 <div>
   <input r-bind={data.name}/>
+  <button style="height:30px; width:100px" r-onClick={change}>Bonjour !</button>
   <h1>{data.name}</h1>
-</div>
+</div>   
                       
                 
           </textarea>
 
-  </div>
+  </div> -->
 
 
-  <!-- <div id="input-editor">
+  <div id="input-editor">
 
     <textarea id="editor-text">
   <script>
@@ -131,7 +133,7 @@
 
 </textarea>
 
-</div> -->
+</div>
 
 
 
@@ -151,7 +153,7 @@
   <script src="https://unpkg.com/codemirror@5.40.0/mode/xml/xml.js"></script>
   <script src="https://unpkg.com/codemirror@5.40.0/mode/htmlmixed/htmlmixed.js"></script>
   <script src="https://unpkg.com/codemirror@5.40.0/mode/jsx/jsx.js"></script>
-  <script src="./rien.js"></script>
+  <script src="./rien.umd.js"></script>
   <script src="./examples.js"></script>
 </body>
 

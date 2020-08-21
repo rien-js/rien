@@ -1,3 +1,5 @@
 /node_modules
 pub/rien.js
+
+pub/rien.umd.js
 example/examples.js
