@@ -1,35 +1,9 @@
 import { parse, parseExpressionAt } from 'acorn';
+import {selfClosingElements} from './utils/elements';
 import { whiteSpace, openingTag, closingTag, attribute, scriptEnd } from './utils/patterns.js';
 import { ParseError } from './utils/error';
 
 const log = console.log;
-
-
-// const template = `<div class='child'><span>asdf</span></div>`;
-// let doc = parse(template, 'text/html');
-// console.log(doc);
-
-
-// not support for attributes yet
-
-// const generateMap = (string) => {
-//   const map = {};
-//   const items = string.split(',');
-//   items.forEach((item) => {
-//     map[item.trim()] = true;
-//   })
-//   return map;
-// }
-
-// const blockElements = generateMap("address, article, aside, blockquote, \
-//   canvas, dd, div, dl, dt, fieldset, figcaption, figure, footer, form, \
-//   h1, h2, h3, h4, h5, h6, header, hr, li, main, nav, noscript, ol, p, \
-//   pre, section, table, tfoot, ul, video");
-
-// const inlineElements = generateMap("a, abbr, acronym, b, bdo, big, br, \
-//   button, cite, code, dfn, em, i, img, input, kbd, label, map, object, \
-//   output, q, samp, script, select, small, span, strong, sub, sup, textarea, \
-//   time, tt, var>");
 
 export default (template) => {
   let index = 0
@@ -60,7 +34,6 @@ export default (template) => {
 
   const parseOpeningTag = (tag, tagName, attributes, rest) => {
     // TODO handle tags like <li>
-    // handle tags self closed
     const attrs = [];
     const listeners = [];
     if (attributes) {
@@ -72,7 +45,6 @@ export default (template) => {
         if (match[1].startsWith('r-on')) {
           if (match[2]!==''){
           // event listener
-            log("listener success")
             listeners.push({ key: match[1].slice(4).toLowerCase(), value: match[6] })
 
             // const expression = parseExpressionAt(match[6])
@@ -83,14 +55,20 @@ export default (template) => {
           }
         } else {
           if (match[3]) attrs.push({ key: match[1], value: match[2] })
+          // curly attributes
           else if (match[5]) attrs.push({ key: match[1], value: match[6] })
         }
       }
     }
     const newElement = createNewElement('element', attrs, curNode, tagName, listeners);
     curNode.children.push(newElement);
-    curNode = newElement;
-    stack.push(tagName);
+    if (!selfClosingElements[tagName]) {
+      curNode = newElement;
+      stack.push(tagName);
+    }
+    log('stack:')
+    log(stack)
+    
   }
 
   const throwError = (message, template, index) => {

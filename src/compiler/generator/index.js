@@ -38,8 +38,6 @@ export default (parsed) => {
         if (node.attrs && node.attrs.length !== 0) {
           node.attrs.forEach(entry => result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`))
         }
-        log("listeners:")
-        log(node.listeners)
         if (node.listeners && node.listeners.length !== 0) {
           node.listeners.forEach(entry => result.push(`${varName}.addEventListener("${entry.key}", ${entry.value})`))
         }
@@ -48,12 +46,7 @@ export default (parsed) => {
         // replace change line chararter
         return `${varName} = document.createTextNode("${node.name.replace(/\n/g, '\\n')}")`
       case 'curly':
-        log(`node.name:`)
-        log(node.name)
         if (node.name.startsWith('data.')){
-          log(`successfullyyyyy`)
-          log (`curlyMapping:`)
-          log (curlyMapping)
           const name = node.name.slice(5)
           if (curlyMapping[name]) curlyMapping[name].push(varName)
           else curlyMapping[name] = [varName]
