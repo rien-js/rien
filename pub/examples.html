@@ -38,10 +38,7 @@
 
 
 
-
-
-
-  <div id="input-editor">
+  <!-- <div id="input-editor">
 
     <textarea id="editor-text">
 <script>
@@ -61,7 +58,33 @@
 </div>
           </textarea>
 
+  </div> -->
+
+
+
+  <div id="input-editor">
+
+    <textarea id="editor-text">
+<script>
+  const data = {
+    count: 0
+  }
+  function handleClick() {
+    data.count ++
+  }
+</script> 
+<div>
+  <button r-onClick={handleClick}>{data.count}</button>
+</div>
+                      
+                
+          </textarea>
+
   </div>
+
+
+
+
 
 
   

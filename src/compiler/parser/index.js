@@ -1,4 +1,4 @@
-import { parse } from 'acorn';
+import { parse, parseExpressionAt } from 'acorn';
 import { whiteSpace, openingTag, closingTag, attribute, scriptEnd } from './utils/patterns.js';
 import { ParseError } from './utils/error';
 
@@ -72,8 +72,14 @@ export default (template) => {
         if (match[1].startsWith('r-on')) {
           if (match[2]!==''){
           // event listener
-            log("success")
+            log("listener success")
             listeners.push({ key: match[1].slice(4).toLowerCase(), value: match[6] })
+
+            // const expression = parseExpressionAt(match[6])
+            // if ( expression.type !== 'CallExpression' ) {
+            //   throwError( `Expected call expression`, template, index );
+            // }
+            // listeners.push({ key: match[1].slice(4).toLowerCase(), value: expression })
           }
         } else {
           if (match[3]) attrs.push({ key: match[1], value: match[2] })
@@ -129,7 +135,6 @@ export default (template) => {
 
       } else if (template.slice(index, index + 1) === '<') {
         // Opening tag
-        // TODO: handle styles specially
         match = template.slice(index, wholeLength).match(openingTag);
         if (!match) {
           throwError(`Cannot match the opening tag`, template, index);

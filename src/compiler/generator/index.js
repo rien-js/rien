@@ -8,6 +8,7 @@ export default (parsed) => {
   // const tops = [];
   const nodes = [];
   const vars = [];
+  const curlyMapping = {};
   let count = 0;
 
   const generateNodesAndVars = (node, parentIndex) => {
@@ -47,6 +48,16 @@ export default (parsed) => {
         // replace change line chararter
         return `${varName} = document.createTextNode("${node.name.replace(/\n/g, '\\n')}")`
       case 'curly':
+        log(`node.name:`)
+        log(node.name)
+        if (node.name.startsWith('data.')){
+          log(`successfullyyyyy`)
+          log (`curlyMapping:`)
+          log (curlyMapping)
+          const name = node.name.slice(5)
+          if (curlyMapping[name]) curlyMapping[name].push(varName)
+          else curlyMapping[name] = [varName]
+        }
         return `${varName} = document.createTextNode(${node.name})`
     }
   }
@@ -69,29 +80,53 @@ export default (parsed) => {
   parsed.root.children.forEach(child => generateNodesAndVars(child));
   // const {props, statements} = handleScript(parsed.parsedScript)
 
+  
   const code = `
 
-  function Component({target, props}) {
-    // TODO: props for variables
-    
-    ${parsed.script}
+function Component({target, props}) {
+  // TODO: props
+  let ${vars.join(',')}
+  
+  ${parsed.script}
+  
+  mapValue = (varName, nodes) => { 
+    const defaultValue = data[varName]
+    Object.defineProperty(data, varName, {
+      get: () => {
+        return this.value;
+      },
+      set: (newValue) => { 
+        nodes.forEach(node => {
+          node.nodeValue = newValue
+          console.log(node)
+        })
+        this.value = newValue;
+     },
+     configurable: true
+    })
+    data[varName] = defaultValue
+  }
 
-    let ${vars.join(',')}
-    return {
-      create() {
-        ${nodes.map(node => createNode(node)).join('\n')}
-      },
-      mount() {
-        ${nodes.map(node => mountNode(node)).join('\n')}
-      },
-      update(changes) {
-        // TODO
-      },
-      detach() {
-        ${nodes.map(node => detach(node)).join('\n')}
-      }
+
+
+  return {
+    create() {
+      ${nodes.map(node => createNode(node)).join('\n')}
+      ${Object.keys(curlyMapping).map((key) => (
+        `mapValue('${key}', [${curlyMapping[key]}])`
+      )).join('\n')}
+    },
+    mount() {
+      ${nodes.map(node => mountNode(node)).join('\n')}
+    },
+    update(changes) {
+      // TODO for props use
+    },
+    detach() {
+      ${nodes.map(node => detach(node)).join('\n')}
     }
-  }`
+  }
+}`
   log(nodes)
   return code;
 }
