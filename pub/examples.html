@@ -67,14 +67,15 @@
     <textarea id="editor-text">
 <script>
   const data = {
-    count: 0
+    count: 'click me!'
   }
   function handleClick() {
-    data.count ++
+    if (data.count === 'click me!') data.count = 1
+    else data.count ++
   }
 </script> 
 <div>
-  <button style='width:100px; height:30px' r-onClick={handleClick}>
+  <button r-onClick={handleClick} style='width:100px; height:30px'>
     {data.count}
   </button>
 </div>
