@@ -19,3 +19,6 @@ app.listen(port, () => {
    // We've bound that port to localhost to go to our express server.
    // Must restart web server when you make changes to route handlers.
 
+app.get('/', (req, res) => {
+   res.sendFile(__dirname + "/pub/examples.html")
+  })

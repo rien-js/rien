@@ -4,12 +4,8 @@ To generate the compiler, use
 ```bash
 npm run build
 ```
-The bundled compiler index.js will be generated.
+The bundled compiler rien.umd.js will be generated in the pub folder
 
-To produce generated example js file, use
-```bash
-npm run example
-``` 
 then example/index.js will be generated. Open example/index.html to see the result.
 
 
@@ -46,4 +42,91 @@ There are still many challenging things next, such as formatting the generated f
 
 
 
+Final Submission – Rien.js
+Name: Chenhao Jiang
+Student Number: 1004732015
+UTORID: jiangc54
+Library Name: Rien.js
+GitHub: https://github.com/csc309-summer-2020/js-library-jiangc54
+Landing Page:  https://rienjs.herokuapp.com/
+External Libraries: 
+"@rollup/plugin-node-resolve": "^9.0.0",
+    	"acorn": "^8.0.1",
+    	"rollup": "^2.23.0"
+
+API Document
+<script></script>
+A script block is very similar to what we had in the Vanilla JS, it contains the JavaScript codes that could be run when the instance is created. It contains basically all of the same use case as Vanilla JS. 
+
+HTML Tags	
+You can use any tags that you used to use in the Vanilla JS. These are still the same here. Rien.js would translate them into abstract syntax tree, and generate them into brower DOM, so all the tags you wrote here would be transferred to JavaScript DOM-related operations.
+
+Attributes
+Vanilla JS attributes still apply here, you can write exactly the same as Vanilla JS in terms of  attributes.
+
+Dynamic attributes
+	Finally, here comes something different with Vanilla JS. Instead of writing 
+<input value=”JohnDoe”>
+you can write it as 
+<script> 
+const state= {name: “JohnDoe”}
+<script>
+<input value={state.name}> 
+Why bother? It seems you need to write more codes to get the same effect, but don’t forget you are always free to write orginal HTML. The benefit of this is you might want to update the value of input when state.name changes, but by writing this way, you do not need to use JavaScript to obtain the DOM node of that input tag, and use DOM operations to change its value, Rien has already done them for you.
+What is more exciting is that you could even write functions insides dynamic attributes, just like what we did in React or Vue. Let’s wait and see.
+ 
+Text 
+You can still do what you did in Vanilla JS, write text insides tags, and if you need to change them later, you will use JavaScript and DOM manipulations. But with Rien.js, you can use variables in your text.
+<script>
+	const state = {name: “world”}
+<script>
+<h1>Hello, {state.name}!</h1>
+It looks just like some template engines or React JSX syntax. Isn’t it cool?
+The variables whose values are changed will automatically update to all the node that use these variables. The deep implementation is called data hijacking, which is the same approach that Vue.js used to update its view layer. The dynamic attributes is implemented using the same technics.
+
+r-on (Event Listener)
+People will get curious once they saw this in the example page. It is automatically binding listener of events. 
+The usage is to add the event you want to listen right after r-on, and set a function to handle it. For example,
+<input r-onInput={handleInput}>
+So that when the input event of this input tag is triggered, the handleInput function would be called. Of course you need to define it in your <script> block.
+Or even more,
+<script>
+	const state = {name: “”}
+<script>
+<input r-onInput={(e)=>(state.name=e.target.value) }
+So you can directly get the value of input through state.name, just like React does.
+
+ 
+r-bind (double-direction data binding)
+As you might know that most of state managements modules prefers to use one-direction data flow. It might not be that cool, but it could be easier to debug and maintain. However, Vue still has v-model, for interaction convenience. Rien.js also has such thing, even though it is just a Syntactic sugar, it would still bring convenience to the process of developing.
+<script>
+	const state = {name: “”}
+<script>
+<input r-bind={state.name}>
+In such way, if you modify the value through the input, it will update the value of state.name, if you modify the value through somewhere else, it will also update the value of input.
+
+{r-for    r-end}
+This is a new functionality in the process, it has not been finished, but right now it already could render list. (Did not Support updating)
+<script>
+  const state = {
+    lst: [
+      {id: 0, name: "Alpha", age: 10}, 
+      {id: 1, name: "Bravo", age: 20},
+    ]
+  }
+</script>
+<div>    
+  {r-for
+    state.lst.map(item => 
+      `<li>
+	I am ${item.name}, I am ${item.age} years old
+       </li>`
+    )
+  r-end}
+</div>>
+
+			
+
+
+	
 

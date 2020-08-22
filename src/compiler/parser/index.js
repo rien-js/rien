@@ -2,6 +2,7 @@ import { parse, parseExpressionAt } from 'acorn';
 import { selfClosingElements } from './utils/elements';
 import { whiteSpace, openingTag, closingTag, attribute, scriptEnd } from './utils/patterns.js';
 import { ParseError } from './utils/error';
+// I imported parse and parseExpressionAt at this place
 
 const log = console.log;
 
@@ -105,7 +106,7 @@ export default (template) => {
         // Comment
         index = template.indexOf('-->', index);
         if (index != -1) {
-          // TODO handle comment later
+          // maybe handle comment later or not 
           index += 3;
         }
 
@@ -144,6 +145,7 @@ export default (template) => {
             // if (scriptContent) {
             script = scriptContent
             log(`script=${scriptContent}`)
+            // I used parse() from 'acorn' at this place
             parsedScript = parse(scriptContent, { ecmaVersion: 2017 })
             log(parsedScript)
             // }   

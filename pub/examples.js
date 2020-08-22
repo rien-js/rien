@@ -9,8 +9,6 @@ resultBlock.appendChild(resultPage)
 let myTextArea
 let editor
 
-//#2c5466
-// #263238
 
 myTextArea = document.getElementById('editor-text-0')
   editor = CodeMirror.fromTextArea(myTextArea, {
@@ -30,18 +28,20 @@ const getEditor = (id) => {
 
 const files = document.getElementsByClassName("rien-file")
 
-let fileNode = files[0]
-fileNode.setAttribute('style', 'background-color: #263238;')
 
-for (let i = 0; i< files.length; i++){
+let fileNode = files[0]
+
+for (let i = 0; i < files.length; i++){
   files[i].addEventListener("click", ()=>{
-    fileNode.setAttribute('style', 'background-color: #2c5466;')
+    fileNode.setAttribute('style', 'background-color: #5b499d;')
     getEditor(i)
     fileNode = files[i]
     fileNode.setAttribute('style', 'background-color: #263238;')
   })
 }
 
+
+fileNode.setAttribute('style', 'background-color: #263238;')
 
 
 const errorNode = document.getElementById("error-message")
