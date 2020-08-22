@@ -27,7 +27,12 @@ const getEditor = (id) => {
 }
 
 const files = document.getElementsByClassName("rien-file")
-
+document.getElementById("header-img").addEventListener("click", ()=>{
+  fileNode.setAttribute('style', 'background-color: #5b499d;')
+  getEditor(0)
+  fileNode = files[0]
+  fileNode.setAttribute('style', 'background-color: #263238;')
+})
 
 let fileNode = files[0]
 
