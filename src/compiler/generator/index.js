@@ -38,12 +38,19 @@ export default (parsed) => {
         let result = [`${varName} = document.createElement("${node.name}")`]
         // add attrs if there is any
         if (node.attrs && node.attrs.length !== 0) {
+          log('attrs')
+          log(node.attrs)
+          
           node.attrs.forEach(entry => {
-            if (entry.value.startsWith('data.')){
-              const name = entry.value.slice(5)
+            if (entry.value.startsWith('state.')){
+              log('entry value')
+              log(entry.value)
+              const name = entry.value.slice(6)
               if (curlyMapping[name]) curlyMapping[name].push(varName)
               else curlyMapping[name] = [varName]
             }
+            log("curlyMapping")
+            log(curlyMapping)
             result.push(`${varName}.setAttribute("${entry.key}", ${entry.value})`)
           })
         }
@@ -56,8 +63,8 @@ export default (parsed) => {
         // replace change line chararter
         return `${varName} = document.createTextNode("${node.name.replace(/\n/g, '\\n')}")`
       case 'curly':
-        if (node.name.startsWith('data.')){
-          const name = node.name.slice(5)
+        if (node.name.startsWith('state.')){
+          const name = node.name.slice(6)
           if (curlyMapping[name]) curlyMapping[name].push(varName)
           else curlyMapping[name] = [varName]
         }
@@ -67,7 +74,7 @@ export default (parsed) => {
         const mapIndex = node.name.indexOf('.map')
         return `${varName} = document.createElement("div")\n \
         ${varName}.innerHTML = ${node.name}.join('')\n \
-        ${node.name.startsWith('data.') && `mapList('${node.name.slice(5, mapIndex)}', ${varName})`}`
+        ${node.name.startsWith('state.') && `mapList('${node.name.slice(6, mapIndex)}', ${varName})`}`
     }
   }
 
@@ -120,8 +127,8 @@ function Component({target, props}) {
   ${parsed.script}
   ${(curlyMapping && Object.entries(curlyMapping).length !== 0) &&
   `mapValue = (stateName, nodes) => { 
-    const defaultValue = data[stateName]
-    Object.defineProperty(data, stateName, {
+    const defaultValue = state[stateName]
+    Object.defineProperty(state, stateName, {
       get: () => {
         return this.value;
       },
@@ -136,24 +143,32 @@ function Component({target, props}) {
      },
      configurable: true
     })
-    data[stateName] = defaultValue
+    state[stateName] = defaultValue
   }`}
 
   ${forStatement && `
   // temporarily only support one for block
   mapList = (stateName, node) => { 
-    const defaultValue = data[stateName]
-    Object.defineProperty(data, stateName, {
+    const defaultValue = state[stateName]
+    console.log(state[stateName])
+    Object.defineProperty(state, stateName, {
       get: () => {
         return this.value;
       },
       set: (newValue) => { 
         this.value = newValue;
+        console.log('newValue')
+        console.log(newValue)
+        
         node.innerHTML = ${forStatement}.join('')
      },
      configurable: true
     })
-    data[stateName] = defaultValue
+    console.log("defaultValue")
+    console.log(defaultValue)
+    state[stateName] = defaultValue
+    console.log("state[stateName]")
+    console.log(state[stateName])
   }`}
 ` + returnPartCode
 
