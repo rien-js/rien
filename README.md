@@ -1,5 +1,9 @@
 # Rien.js
+WARNING: This framework is archived. 
 
+I had the idea years but got to implement it in 2020 since I think the popular frameworks right now are quite invasive, which could not be necessary. The virtual DOM is not necessary as well. I believe the DOM manipulation could have better API design, so I designed this.
+
+However, I found there is a new framework called [Svelte](https://svelte.dev/), which seems quite great. It just fulfills what I thought of and already has a huge community and many contributors. So I decide not to reinvent the wheel. Svelte confirms some of my thoughts to be right, which I am quite happy about, and I believe it is a promising framework; however, on the other hand, it also reveals some problems, such as the code reusability problem, which I did not think of seriously before. I might be a contributor of svelte in the future, or not, but anyhow, I will always try to build something new (migbt replace the web environment).
 
 Landing Page:  https://rienjs.herokuapp.com/
 
